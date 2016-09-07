@@ -36,6 +36,7 @@ import com.artemis.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.esotericsoftware.spine.SkeletonMeshRenderer;
+import com.esotericsoftware.spine.SkeletonRenderer;
 import com.kotcrab.vis.runtime.component.Invisible;
 import com.kotcrab.vis.runtime.component.Tint;
 import com.kotcrab.vis.runtime.component.Transform;
@@ -52,16 +53,20 @@ public class SpineRenderSystem extends DeferredEntityProcessingSystem {
 	private RenderBatchingSystem renderBatchingSystem;
 	private Batch batch;
 
-	private SkeletonMeshRenderer skeletonMeshRenderer;
+	private SkeletonRenderer skeletonRenderer;
 
 	public SpineRenderSystem (EntityProcessPrincipal principal) {
 		super(Aspect.all(VisSpine.class).exclude(Invisible.class), principal);
-		skeletonMeshRenderer = new SkeletonMeshRenderer();
 	}
 
 	@Override
 	protected void initialize () {
 		batch = renderBatchingSystem.getBatch();
+		if (batch instanceof PolygonSpriteBatch) {
+			skeletonRenderer = new SkeletonMeshRenderer();
+		} else {
+			skeletonRenderer = new SkeletonRenderer();
+		}
 	}
 
 	@Override
@@ -77,7 +82,6 @@ public class SpineRenderSystem extends DeferredEntityProcessingSystem {
 		spine.state.update(world.delta);
 		spine.state.apply(spine.skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
 		spine.skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
-		// WARNING: This crashes when batch isn't a PolygonSpriteBatch!
-		skeletonMeshRenderer.draw((PolygonSpriteBatch) batch, spine.skeleton);
+		skeletonRenderer.draw(batch, spine.skeleton); // Draw the skeleton images.
 	}
 }
