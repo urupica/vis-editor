@@ -25,8 +25,8 @@ public class ColorPickerStyle extends WindowStyle {
 	public ColorPickerStyle () {
 	}
 
-	public ColorPickerStyle (ColorPickerStyle other) {
-		super(other);
-		this.pickerStyle = other.pickerStyle;
+	public ColorPickerStyle (ColorPickerStyle style) {
+		super(style);
+		if (style.pickerStyle != null) this.pickerStyle = new ColorPickerWidgetStyle(style.pickerStyle);
 	}
 }

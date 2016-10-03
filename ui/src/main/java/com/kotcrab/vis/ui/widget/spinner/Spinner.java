@@ -73,15 +73,16 @@ public class Spinner extends VisTable {
 		VisTable buttonsTable = new VisTable();
 		VisImageButton upButton = new VisImageButton(style.up);
 		VisImageButton downButton = new VisImageButton(style.down);
+		VisValidatableTextField textField = createTextField();
 
-		buttonsTable.add(upButton).height(sizes.spinnerButtonSize).row();
-		buttonsTable.add(downButton).height(sizes.spinnerButtonSize);
+		buttonsTable.add(upButton).height(sizes.spinnerButtonHeight).row();
+		buttonsTable.add(downButton).height(sizes.spinnerButtonHeight);
 
 		labelCell = add(new VisLabel(""));
 		setSelectorName(name);
 
-		textFieldCell = add(createTextField()).fillX().expandX().height(sizes.spinnerButtonSize * 2).padRight(sizes.spinnerFieldRightPadding);
-		add(buttonsTable).width(sizes.spinnerButtonsWidth);
+		textFieldCell = add(textField).height(sizes.spinnerButtonHeight * 2).growX();
+		add(buttonsTable);
 
 		addButtonsListeners(upButton, downButton);
 
@@ -272,6 +273,11 @@ public class Spinner extends VisTable {
 		public SpinnerStyle () {
 		}
 
+		public SpinnerStyle (SpinnerStyle style) {
+			this.up = style.up;
+			this.down = style.down;
+		}
+
 		public SpinnerStyle (Drawable up, Drawable down) {
 			this.up = up;
 			this.down = down;
@@ -296,7 +302,7 @@ public class Spinner extends VisTable {
 	 * Spinner text field.
 	 * @since 1.1.6
 	 */
-	enum TextFieldEventPolicy {
+	public enum TextFieldEventPolicy {
 		/**
 		 * Spinner change event will be only fired after user has pressed enter in text field. This mode is the default
 		 * one prior to VisUI 1.1.6

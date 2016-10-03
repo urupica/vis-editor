@@ -49,7 +49,7 @@ public class Menu extends PopupMenu {
 		super(style);
 		this.title = title;
 
-		openButton = new VisTextButton(title, new VisTextButtonStyle(VisUI.getSkin().get(style.openButtonStyleName, VisTextButtonStyle.class)));
+		openButton = new VisTextButton(title, new VisTextButtonStyle(style.openButtonStyle));
 		buttonDefault = openButton.getStyle().up;
 
 		openButton.addListener(new InputListener() {
@@ -114,14 +114,19 @@ public class Menu extends PopupMenu {
 	}
 
 	public static class MenuStyle extends PopupMenuStyle {
-		public String openButtonStyleName;
+		public VisTextButtonStyle openButtonStyle;
 
 		public MenuStyle () {
 		}
 
-		public MenuStyle (Drawable background, Drawable border, String openButtonStyleName) {
+		public MenuStyle (MenuStyle style) {
+			super(style);
+			this.openButtonStyle = style.openButtonStyle;
+		}
+
+		public MenuStyle (Drawable background, Drawable border, VisTextButtonStyle openButtonStyle) {
 			super(background, border);
-			this.openButtonStyleName = openButtonStyleName;
+			this.openButtonStyle = openButtonStyle;
 		}
 	}
 }

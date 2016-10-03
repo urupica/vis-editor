@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package com.kotcrab.vis.editor.util.vis;
+package com.kotcrab.vis.editor.util.gdx
 
-import com.artemis.SystemInvocationStrategy;
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.Timer
 
-/** @author Kotcrab */
-public class NoneInvocationStrategy extends SystemInvocationStrategy {
-	@Override
-	protected void process () {
+class RepeatableTimedKey(private val key: Int, private val doAction: () -> Any) : Timer.Task() {
+    private val keyRepeatTime = 0.05f
 
-	}
+    fun update() {
+        if (Gdx.input.isKeyPressed(key) == false) {
+            cancel()
+            return
+        }
+        if (isScheduled) return
+        run()
+        Timer.schedule(this, keyRepeatTime, keyRepeatTime)
+    }
+
+    override fun run() {
+        doAction()
+    }
 }

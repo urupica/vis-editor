@@ -100,7 +100,7 @@ public class FileChooser extends VisWindow implements FileHistoryCallback {
 
 	private ExecutorService listDirExecutor = Executors.newSingleThreadExecutor(new ServiceThreadFactory("FileChooserListDirThread"));
 	private Future<?> listDirFuture;
-	private ShotBusyBarTask showBusyBarTask = new ShotBusyBarTask();
+	private ShowBusyBarTask showBusyBarTask = new ShowBusyBarTask();
 
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -228,7 +228,7 @@ public class FileChooser extends VisWindow implements FileHistoryCallback {
 		reloadPreferences(false);
 
 		createToolbar();
-		viewModePopupMenu = new PopupMenu(style.popupMenuStyleName);
+		viewModePopupMenu = new PopupMenu(style.popupMenuStyle);
 		createViewModePopupMenu();
 		createCenterContentPanel();
 		createFileTextBox();
@@ -1718,7 +1718,7 @@ public class FileChooser extends VisWindow implements FileHistoryCallback {
 		}
 	}
 
-	private class ShotBusyBarTask extends Timer.Task {
+	private class ShowBusyBarTask extends Timer.Task {
 		@Override
 		public void run () {
 			fileListBusyBar.resetSegment();
