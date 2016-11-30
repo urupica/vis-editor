@@ -55,9 +55,7 @@ public class ComponentSelectDialog extends VisTable { //TODO search field when w
 
 		setBackground(VisUI.getSkin().getDrawable("tooltip-bg"));
 
-		for (UserAddableComponentProvider provider : extensionStorage.getUserAddableComponentProviders()) {
-			componentClasses.add(provider.provide());
-		}
+		reloadComponents();
 
 		buttonStyle = new VisTextButtonStyle(VisUI.getSkin().get(VisTextButtonStyle.class));
 
@@ -99,6 +97,13 @@ public class ComponentSelectDialog extends VisTable { //TODO search field when w
 
 	public Array<Class<? extends Component>> getComponentClasses () {
 		return componentClasses;
+	}
+	
+	public void reloadComponents() {
+		componentClasses.clear();
+		for (UserAddableComponentProvider provider : extensionStorage.getUserAddableComponentProviders()) {
+			componentClasses.add(provider.provide());
+		}
 	}
 
 	@Override

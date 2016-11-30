@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.kotcrab.vis.editor.module.project.converter;
+package com.kotcrab.vis.ui.util.adapter;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.kotcrab.vis.ui.util.async.AsyncTask;
+import com.kotcrab.vis.ui.util.adapter.AbstractListAdapter.ListSelectionListener;
 
-/** @author Kotcrab */
-public class DummyConverter extends ProjectConverter {
-	public DummyConverter (int fromVersion, int toVersion) {
-		super(fromVersion, toVersion);
+/**
+ * Empty {@link ListSelectionListener} implementation.
+ * @author Kotcrab
+ */
+public class ListSelectionAdapter<ItemT, ViewT> implements ListSelectionListener<ItemT, ViewT> {
+	@Override
+	public void selected (ItemT item, ViewT view) {
+
 	}
 
 	@Override
-	public AsyncTask getConversionTask (FileHandle dataFile) {
-		return null;
+	public void deselected (ItemT item, ViewT view) {
+
 	}
 }

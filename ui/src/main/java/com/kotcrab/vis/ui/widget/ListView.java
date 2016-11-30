@@ -19,6 +19,7 @@ package com.kotcrab.vis.ui.widget;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.adapter.AbstractListAdapter;
 import com.kotcrab.vis.ui.util.adapter.ArrayAdapter;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
@@ -49,6 +50,15 @@ public class ListView<ItemT> {
 	private Actor footer;
 
 	public ListView (ListAdapter<ItemT> adapter) {
+		this(adapter, "default");
+	}
+
+	public ListView (ListAdapter<ItemT> adapter, String styleName) {
+		this(adapter, VisUI.getSkin().get(styleName, ListViewStyle.class));
+	}
+
+	public ListView (ListAdapter<ItemT> adapter, ListViewStyle style) {
+		if (style == null) throw new IllegalArgumentException("style can't be null");
 		if (adapter == null) throw new IllegalArgumentException("adapter can't be null");
 		this.adapter = adapter;
 
@@ -56,7 +66,7 @@ public class ListView<ItemT> {
 		scrollTable = new VisTable();
 		itemsTable = new VisTable();
 
-		scrollPane = new VisScrollPane(scrollTable);
+		scrollPane = new VisScrollPane(scrollTable, style.scrollPaneStyle);
 		scrollPane.setOverscroll(false, true);
 		scrollPane.setFlickScroll(false);
 		scrollPane.setFadeScrollBars(false);
@@ -112,6 +122,10 @@ public class ListView<ItemT> {
 	public void setItemClickListener (ItemClickListener<ItemT> listener) {
 		this.clickListener = listener;
 		adapter.setItemClickListener(listener);
+	}
+
+	public ItemClickListener<ItemT> getClickListener () {
+		return clickListener;
 	}
 
 	public Actor getHeader () {
@@ -184,4 +198,5 @@ public class ListView<ItemT> {
 			return listView;
 		}
 	}
+
 }

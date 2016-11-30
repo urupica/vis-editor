@@ -1,5 +1,27 @@
-#### Version: 1.2.4-SNAPSHOT (LibGDX 1.9.4)
+#### Version: 1.2.5-SNAPSHOT (LibGDX 1.9.4)
+- **Added**: `AsyncTask` API and `AsyncTaskProgressDialog` (incubating - API or behaviour may change)
+- **Added**: `PopupMenu.removeEveryMenu(Stage)`
+- **Added**: `FileChooser#setShowSelectionCheckboxes`
+- **Added**: `FileChooser#getIconProvider`
+- **Added**: `Spinner#setDisabled(boolean)`, `Spinner#isDisabled()`
+- **Added**: `HorizontalCollapsibleWidget`
+- **Fixed**: `MultiSplitPane#setSplit` not affecting split values
+- **Fixed**: `MultiSplitPane` and `VisSplitPane` default cursor not restored when mouse exited widget bounds when mouse was still on split handle bar 
+- **Changed**: Selection of menu item is removed when mouse pointer leaves popup menu structure
+- **I18N Changes**:
+   - Added `Common` bundle
+
+#### Version: 1.2.4 (LibGDX 1.9.4)
+- **Added**: `ListSelection#setListener`, `#setProgrammaticChangeEvents` (with getters)
 - **Fixed**: `Spinner.TextFieldEventPolicy` is now public (was package-private)
+- **Fixed**: `HighlightTextArea` scroll pane not immediately updated after changing text using `setText()`
+- **Improved**: [#220](https://github.com/kotcrab/vis-editor/issues/220) when sub menu can't fit on the right side of parent menu, it will be shown on the side that has more available space (before in such case it was always shown on the left side)
+- **Improved**: When mouse is moved from sub-menu to parent menu, selection of menu item in sub-menu will be removed.
+- **Improved**: [#222](https://github.com/kotcrab/vis-editor/issues/222) Added clipping to BusyBar
+- **Skin changes**:
+   - **Added style**: `ListViewStyle` - allows to customize `ListView` scroll pane style
+   - **Added new icons**: `icon-maximize`, `icon-minimize`, `icon-restore`, `icon-close-titlebar`
+   - **Added style**: `VisImageButtonStyle`: `close-titlebar`
 
 #### Version: 1.2.3 (LibGDX 1.9.4)
 - **Added**: constructor `LinkLabel (CharSequence text, CharSequence url, LinkLabelStyle style)`

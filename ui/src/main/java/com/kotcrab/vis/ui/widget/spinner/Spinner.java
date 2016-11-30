@@ -52,11 +52,14 @@ public class Spinner extends VisTable {
 	//task is shared between two buttons
 	private ButtonRepeatTask buttonRepeatTask = new ButtonRepeatTask();
 
+	private VisImageButton upButton;
+	private VisImageButton downButton;
 	private Cell<VisValidatableTextField> textFieldCell;
 	private Cell<VisLabel> labelCell;
 
 	private TextFieldEventPolicy textFieldEventPolicy = TextFieldEventPolicy.ON_FOCUS_LOST;
 	private boolean programmaticChangeEvents = true;
+	private boolean disabled;
 
 	public Spinner (String name, SpinnerModel model) {
 		this("default", name, model);
@@ -71,10 +74,9 @@ public class Spinner extends VisTable {
 		this.model = model;
 
 		VisTable buttonsTable = new VisTable();
-		VisImageButton upButton = new VisImageButton(style.up);
-		VisImageButton downButton = new VisImageButton(style.down);
 		VisValidatableTextField textField = createTextField();
-
+		upButton = new VisImageButton(style.up);
+		downButton = new VisImageButton(style.down);
 		buttonsTable.add(upButton).height(sizes.spinnerButtonHeight).row();
 		buttonsTable.add(downButton).height(sizes.spinnerButtonHeight);
 
@@ -164,6 +166,7 @@ public class Spinner extends VisTable {
 
 			@Override
 			public boolean scrolled (InputEvent event, float x, float y, int amount) {
+				if (disabled) return false;
 				if (amount == 1) {
 					decrement(true);
 				} else {
@@ -183,6 +186,17 @@ public class Spinner extends VisTable {
 				return false;
 			}
 		});
+	}
+
+	public void setDisabled (boolean disabled) {
+		this.disabled = disabled;
+		upButton.setDisabled(disabled);
+		downButton.setDisabled(disabled);
+		getTextField().setDisabled(disabled);
+	}
+
+	public boolean isDisabled () {
+		return disabled;
 	}
 
 	public void setSelectorName (String name) {

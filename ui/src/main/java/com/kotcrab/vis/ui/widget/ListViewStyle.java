@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.kotcrab.vis.editor.module.project.converter;
+package com.kotcrab.vis.ui.widget;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.kotcrab.vis.ui.util.async.AsyncTask;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 
 /** @author Kotcrab */
-public class DummyConverter extends ProjectConverter {
-	public DummyConverter (int fromVersion, int toVersion) {
-		super(fromVersion, toVersion);
+public class ListViewStyle {
+	public ScrollPane.ScrollPaneStyle scrollPaneStyle;
+
+	public ListViewStyle () {
 	}
 
-	@Override
-	public AsyncTask getConversionTask (FileHandle dataFile) {
-		return null;
+	public ListViewStyle (ListViewStyle style) {
+		if (style.scrollPaneStyle != null) this.scrollPaneStyle = new ScrollPane.ScrollPaneStyle(style.scrollPaneStyle);
 	}
 }

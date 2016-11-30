@@ -150,6 +150,11 @@ public class MenuItem extends Button {
 		addListener(new InputListener() {
 			@Override
 			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				if (subMenu != null) { //removes selection of child submenu if mouse moved to parent submenu
+					subMenu.setActiveItem(null, false);
+					subMenu.setActiveSubMenu(null);
+				}
+
 				if (subMenu == null || isDisabled()) { //hides last visible submenu (if any)
 					hideSubMenu();
 				} else {
@@ -196,12 +201,16 @@ public class MenuItem extends Button {
 		Stage stage = getStage();
 		Vector2 pos = localToStageCoordinates(tmpVector.setZero());
 
+		float availableSpaceLeft = pos.x;
+		float availableSpaceRight = stage.getWidth() - (pos.x + getWidth());
+		boolean canFitOnTheRight = pos.x + getWidth() + subMenu.getWidth() <= stage.getWidth();
 		float subMenuX;
-		if (pos.x + getWidth() + subMenu.getWidth() >= stage.getWidth()) { //if won't fit on screen
-			subMenuX = pos.x - subMenu.getWidth() + 1;
-		} else {
+		if (canFitOnTheRight || availableSpaceRight > availableSpaceLeft) {
 			subMenuX = pos.x + getWidth() - 1;
+		} else {
+			subMenuX = pos.x - subMenu.getWidth() + 1;
 		}
+
 		subMenu.setPosition(subMenuX, pos.y - subMenu.getHeight() + getHeight());
 
 		if (subMenu.getY() < 0) {

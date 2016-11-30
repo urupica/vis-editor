@@ -16,6 +16,7 @@
 
 package com.kotcrab.vis.ui.widget;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -81,6 +82,20 @@ public class PopupMenu extends Table {
 		createListeners();
 	}
 
+	/**
+	 * Removes every instance of {@link PopupMenu} form {@link Stage} actors.
+	 * <p>
+	 * Generally called from {@link ApplicationListener#resize(int, int)} to remove menus on resize event.
+	 */
+	public static void removeEveryMenu (Stage stage) {
+		for (Actor actor : stage.getActors()) {
+			if (actor instanceof PopupMenu) {
+				PopupMenu menu = (PopupMenu) actor;
+				menu.removeHierarchy();
+			}
+		}
+	}
+
 	private void createListeners () {
 		stageListener = new InputListener() {
 			@Override
@@ -131,6 +146,18 @@ public class PopupMenu extends Table {
 					MenuItem item = (MenuItem) event.getListenerActor();
 					if (item.isDisabled() == false) {
 						setActiveItem(item, false);
+					}
+				}
+			}
+
+			@Override
+			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				if (pointer == -1 && event.getListenerActor() instanceof MenuItem) {
+					if (activeSubMenu != null) return;
+
+					MenuItem item = (MenuItem) event.getListenerActor();
+					if (item == activeItem) {
+						setActiveItem(null, false);
 					}
 				}
 			}
@@ -278,7 +305,7 @@ public class PopupMenu extends Table {
 	}
 
 	public boolean contains (float x, float y) {
-		return getX() <= x && getX() + getWidth() >= x && getY() <= y && getY() + getHeight() >= y;
+		return getX() < x && getX() + getWidth() > x && getY() < y && getY() + getHeight() > y;
 	}
 
 	/** Called by framework, when PopupMenu is added to MenuItem as submenu */
@@ -307,7 +334,7 @@ public class PopupMenu extends Table {
 		return super.remove();
 	}
 
-	private void setActiveItem (MenuItem newItem, boolean keyboardChange) {
+	void setActiveItem (MenuItem newItem, boolean keyboardChange) {
 		activeItem = newItem;
 		if (listener != null) listener.activeItemChanged(newItem, keyboardChange);
 	}

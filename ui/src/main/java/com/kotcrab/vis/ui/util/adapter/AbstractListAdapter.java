@@ -104,6 +104,7 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 	}
 
 	protected void itemRemoved (ItemT item) {
+		selection.deselect(item);
 		getViews().remove(item);
 		viewListener.invalidateDataSet();
 	}
@@ -117,6 +118,7 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 	 * will be ignored.
 	 */
 	public void itemsChanged () {
+		selection.deselectAll();
 		getViews().clear();
 		viewListener.invalidateDataSet();
 	}
@@ -232,31 +234,41 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 
 		private Array<ItemT> selection = new Array<ItemT>();
 
+		private boolean programmaticChangeEvents = true;
+		private ListSelectionListener<ItemT, ViewT> listener = new ListSelectionAdapter<ItemT, ViewT>();
+
 		private ListSelection (AbstractListAdapter<ItemT, ViewT> adapter) {
 			this.adapter = adapter;
 		}
 
 		public void select (ItemT item) {
-			select(item, adapter.getViews().get(item));
+			select(item, adapter.getViews().get(item), true);
 		}
 
-		public void deselect (ItemT item) {
-			deselect(item, adapter.getViews().get(item));
-		}
-
-		void select (ItemT item, ViewT view) {
+		void select (ItemT item, ViewT view, boolean programmaticChange) {
+			if (adapter.getSelectionMode() == SelectionMode.DISABLED) return;
+			if (adapter.getSelectionMode() == SelectionMode.SINGLE) deselectAll(programmaticChange);
 			if (adapter.getSelectionMode() == SelectionMode.MULTIPLE && selection.size >= 1 && isGroupMultiSelectKeyPressed()) {
 				selectGroup(item);
 			}
 
-			doSelect(item, view);
+			doSelect(item, view, programmaticChange);
 		}
 
-		private void doSelect (ItemT item, ViewT view) {
+		private void doSelect (ItemT item, ViewT view, boolean programmaticChange) {
 			if (selection.contains(item, true) == false) {
 				adapter.selectView(view);
 				selection.add(item);
+				if (programmaticChange == false || programmaticChangeEvents) listener.selected(item, view);
 			}
+		}
+
+		public void deselect (ItemT item) {
+			deselect(item, adapter.getViews().get(item), true);
+		}
+
+		public void deselectAll () {
+			deselectAll(true);
 		}
 
 		private void selectGroup (ItemT newItem) {
@@ -278,20 +290,21 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 
 			for (int i = start; i < end; i++) {
 				ItemT item = adapter.get(i);
-				doSelect(item, adapter.getViews().get(item));
+				doSelect(item, adapter.getViews().get(item), false);
 			}
 		}
 
-		void deselect (ItemT item, ViewT view) {
+		void deselect (ItemT item, ViewT view, boolean programmaticChange) {
 			if (selection.contains(item, true) == false) return;
 			adapter.deselectView(view);
 			selection.removeValue(item, true);
+			if (programmaticChange == false || programmaticChangeEvents) listener.deselected(item, view);
 		}
 
-		public void deselectAll () {
+		void deselectAll (boolean programmaticChange) {
 			Array<ItemT> items = new Array<ItemT>(selection);
 			for (ItemT item : items) {
-				deselect(item);
+				deselect(item, adapter.getViews().get(item), programmaticChange);
 			}
 		}
 
@@ -304,14 +317,13 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 			if (adapter.getSelectionMode() == SelectionMode.DISABLED) return;
 
 			if (isMultiSelectKeyPressed() == false && isGroupMultiSelectKeyPressed() == false) {
-				deselectAll();
+				deselectAll(false);
 			}
 
 			if (selection.contains(item, true) == false) {
-				if (adapter.getSelectionMode() == SelectionMode.SINGLE) deselectAll();
-				select(item, view);
+				select(item, view, false);
 			} else {
-				deselect(item, view);
+				deselect(item, view, false);
 			}
 		}
 
@@ -333,6 +345,23 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 			this.groupMultiSelectKey = groupMultiSelectKey;
 		}
 
+		public void setListener (ListSelectionListener<ItemT, ViewT> listener) {
+			if (listener == null) listener = new ListSelectionAdapter<ItemT, ViewT>();
+			this.listener = listener;
+		}
+
+		public ListSelectionListener<ItemT, ViewT> getListener () {
+			return listener;
+		}
+
+		public boolean isProgrammaticChangeEvents () {
+			return programmaticChangeEvents;
+		}
+
+		public void setProgrammaticChangeEvents (boolean programmaticChangeEvents) {
+			this.programmaticChangeEvents = programmaticChangeEvents;
+		}
+
 		private boolean isMultiSelectKeyPressed () {
 			if (multiSelectKey == DEFAULT_KEY)
 				return UIUtils.ctrl();
@@ -346,5 +375,11 @@ public abstract class AbstractListAdapter<ItemT, ViewT extends Actor> extends Ca
 			else
 				return Gdx.input.isKeyPressed(groupMultiSelectKey);
 		}
+	}
+
+	public interface ListSelectionListener<ItemT, ViewT> {
+		void selected (ItemT item, ViewT view);
+
+		void deselected (ItemT item, ViewT view);
 	}
 }

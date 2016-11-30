@@ -37,7 +37,6 @@ import com.kotcrab.vis.editor.module.project.ProjectModuleContainer;
 import com.kotcrab.vis.editor.plugin.api.ContainerExtension.ExtensionScope;
 import com.kotcrab.vis.editor.ui.NoProjectFilesOpenView;
 import com.kotcrab.vis.editor.ui.WindowListener;
-import com.kotcrab.vis.editor.ui.dialog.AsyncTaskProgressDialog;
 import com.kotcrab.vis.editor.ui.dialog.NewProjectDialog;
 import com.kotcrab.vis.editor.ui.dialog.SettingsDialog;
 import com.kotcrab.vis.editor.ui.dialog.UnsavedResourcesDialog;
@@ -46,15 +45,17 @@ import com.kotcrab.vis.editor.ui.tabbedpane.TabViewMode;
 import com.kotcrab.vis.editor.util.ApplicationUtils;
 import com.kotcrab.vis.editor.util.GLFWIconSetter;
 import com.kotcrab.vis.editor.util.ThreadUtils;
-import com.kotcrab.vis.editor.util.async.AsyncTask;
+import com.kotcrab.vis.editor.util.async.Async;
 import com.kotcrab.vis.editor.util.scene2d.VisGroup;
 import com.kotcrab.vis.editor.util.vis.LaunchConfiguration;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.util.async.AsyncTask;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.dialog.Dialogs.OptionDialog;
 import com.kotcrab.vis.ui.util.dialog.Dialogs.OptionDialogType;
 import com.kotcrab.vis.ui.util.dialog.OptionDialogAdapter;
 import com.kotcrab.vis.ui.util.value.PrefHeightIfVisibleValue;
+import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.file.SingleFileChooserListener;
@@ -241,6 +242,7 @@ public class Editor extends ApplicationAdapter {
 	public void resize (int width, int height) {
 		if (width == 0 && height == 0) return;
 		stage.getViewport().update(width, height, true);
+		PopupMenu.removeEveryMenu(stage);
 		editorMC.resize();
 		projectMC.resize();
 	}
@@ -401,13 +403,13 @@ public class Editor extends ApplicationAdapter {
 
 		ProjectLoadingDialogController controller = new ProjectLoadingDialogController();
 
-		AsyncTaskProgressDialog dialog = new AsyncTaskProgressDialog("Loading Project", new AsyncTask("ProjectLoaderThread") {
+		Async.startTask(stage, "Loading Project", new AsyncTask("ProjectLoaderThread") {
 			@Override
-			public void execute () {
+			protected void doInBackground () throws Exception {
 				setProgressPercent(10);
 				setMessage("Loading project data...");
 
-				executeOnOpenGL(() -> {
+				executeOnGdx(() -> {
 					projectLoaded = true;
 					projectMC.setProject(project);
 					VisContainers.createProjectModules(projectMC, extensionStorage);
@@ -417,7 +419,7 @@ public class Editor extends ApplicationAdapter {
 				setProgressPercent(50);
 				ThreadUtils.sleep(10);
 
-				executeOnOpenGL(() -> {
+				executeOnGdx(() -> {
 					projectMC.init();
 
 					settingsDialog.addAll(projectMC.getModules());
@@ -432,8 +434,6 @@ public class Editor extends ApplicationAdapter {
 				}
 			}
 		});
-		dialog.setVisible(true);
-		stage.addActor(dialog);
 	}
 
 	private void switchProject (final Project project) {
